@@ -1,9 +1,8 @@
 # Compendium Browser
+## If you are using Foundry 0.8.x, please use CB v0.7.x
 ## NEW in v0.6: 
 - Additional and Optional Features spells from Tasha's
 - Spanish, German translations
-## v0.5 
-- Support for Foundry 0.8.x
 
 Tired of scrolling compendia? Easily browse and filter for spells, feats, items, and NPCs using Compendium Browser.
 
