@@ -1,5 +1,5 @@
 # Compendium Browser
-### If you are using Foundry 0.8.x, please use [CB v0.7.x](https://github.com/League-of-Foundry-Developers/compendium-browser/releases/download/v0.7.0/module.json]
+### If you are using Foundry 0.8.x, please use [CB v0.7.x](https://github.com/League-of-Foundry-Developers/compendium-browser/releases/download/v0.7.0/module.json)
 ## NEW in v0.6: 
 - Additional and Optional Features spells from Tasha's
 - Spanish, German translations
