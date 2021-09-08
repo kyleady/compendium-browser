@@ -50,12 +50,12 @@
 	    	}
     ],
     "url": "https://github.com/League-of-Foundry-Developers/compendium-browser",
-    "manifest": "https://github.com/League-of-Foundry-Developers/compendium-browser/releases/latest/download/module.json",
+    "manifest": "https://github.com/League-of-Foundry-Developers/compendium-browser/releases/download/v0.6.0/module.json",
     "download": "https://github.com/League-of-Foundry-Developers/compendium-browser/releases/download/v0.6.0/compendium-browser.zip",
     "minimumCoreVersion": "0.6.2",
     "compatibleCoreVersion": "0.8.9",
     "allowBugReporter": true,
     "bugs": "https://github.com/League-of-Foundry-Developers/compendium-browser/issues",
     "readme": "https://github.com/League-of-Foundry-Developers/compendium-browser/blob/master/README.md",
-    "changelog": "https://github.com/League-of-Foundry-Developers/compendium-browser/blob/master/CHANGELOG.md"
+    "changelog": "https://github.com/League-of-Foundry-Developers/compendium-browser/blob/master/Patchnotes.md"
 }
