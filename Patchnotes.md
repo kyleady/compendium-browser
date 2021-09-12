@@ -1,3 +1,6 @@
+#v0.6.1
+- Fixed: Issue #25 (Compendium Browser not showing)
+
 #v0.6.0
 - Merged PR #14, #8 (classes for new spells and Optional Class Features in Tasha's)
 - Manually merged PR #3 (German and Spanish translations)
