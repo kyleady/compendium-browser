@@ -11,43 +11,43 @@
 4-Feb-2020  0.4.0   Switch to not pre-loading the indexes, and instead do that at browsing time, to reduce server load and memory usage
                     Refactor some of the eslint warnings
 5-Feb-2021          Don't do memory allocation - just browse compendia in real-time
-                    After this, next step would be incremental (lazy) loading  
+                    After this, next step would be incremental (lazy) loading
 7-Feb-2021  0.4.1   Move load back to "ready" hook, but limit number loaded
 8-Feb-2021  0.4.1   Bug fix: initialize() was setting this.spells, not this.items so CB was using twice the memory (once loaded incorrectly into this.spells
                     and once loaded on first getData() into this.items)
-            0.4.1b  SpellBrowser -> CompendiumBrowser    
-9-Feb-2021  0.4.1b  Call loadAndFilterItems instead of loadItems; filter as we go, limited by numToPreload   
-            0.4.1c  Needed to pass specific spellFilters, itemFilters etc.    
-            0.4.1d: Fixed img observer on replaced spellData        
-11-Feb-2021 0.4.1e: Don't save the filter data (which is most of the memory) and remove the preload limit; instead just save the minimal amount of data     
-            0.4.1g: Generalize the spell list reload and confirm spells still working   
-            0.4.1h: Add the partials for npc, feat, item and the backing code    
-12-Feb-2021 0.4.1j: Correct compactItem for feats and items required display items   
-                    Rename itemType -> browserTab to differentiate candidate item's type from the tab it appears on (spell, feat/class, item, NPC)  
-                    Fixed: Was calling the wrong sort for feat and NPC    
-            0.4.1k: Don't call loadItems() during initalize; getData() just displays static elements    
-            0.4.1l: Display progress indicator for loading - for now just a static one    
+            0.4.1b  SpellBrowser -> CompendiumBrowser
+9-Feb-2021  0.4.1b  Call loadAndFilterItems instead of loadItems; filter as we go, limited by numToPreload
+            0.4.1c  Needed to pass specific spellFilters, itemFilters etc.
+            0.4.1d: Fixed img observer on replaced spellData
+11-Feb-2021 0.4.1e: Don't save the filter data (which is most of the memory) and remove the preload limit; instead just save the minimal amount of data
+            0.4.1g: Generalize the spell list reload and confirm spells still working
+            0.4.1h: Add the partials for npc, feat, item and the backing code
+12-Feb-2021 0.4.1j: Correct compactItem for feats and items required display items
+                    Rename itemType -> browserTab to differentiate candidate item's type from the tab it appears on (spell, feat/class, item, NPC)
+                    Fixed: Was calling the wrong sort for feat and NPC
+            0.4.1k: Don't call loadItems() during initalize; getData() just displays static elements
+            0.4.1l: Display progress indicator for loading - for now just a static one
 15-Feb-2021 0.4.2:  Fix NPCs to use loadAndFilterNpcs
             0.4.2b: Add Loading... message for NPCs
             0.4.2c: Correct Loading... message on initial tab, but not on tab switch
             0.4.2d: Display the type of item being loaded
-16-Dec-2021 0.4.2f: Change preload to maxLoaded and display a message to filter if you want more      
-10-Mar-2021 0.4.3: activateItemListListeners(): Remove spurious li.parents (wasn't being used anyway)    
-11-Mar-2021 0.4.3  Fixed: Reset Filters doesn't clear the on-screen filter fields (because it is not completely re-rendering like it used to) Issue #4  
+16-Dec-2021 0.4.2f: Change preload to maxLoaded and display a message to filter if you want more
+10-Mar-2021 0.4.3: activateItemListListeners(): Remove spurious li.parents (wasn't being used anyway)
+11-Mar-2021 0.4.3  Fixed: Reset Filters doesn't clear the on-screen filter fields (because it is not completely re-rendering like it used to) Issue #4
                     Hack solution is to re-render whole dialog which unfortunately loses filter settings on other tabs as well
-            0.4.3b: Clear all filters to match displayed   
-15-Mar-2021 0.4.5:  Fix: Spells from non-system compendium show up in items tab. Issue#10   
-                    loadAndFilterItems(): Changed tests to switch + more explicit tests   
-            0.4.5b  Show compendium source in results issue#11                                       
+            0.4.3b: Clear all filters to match displayed
+15-Mar-2021 0.4.5:  Fix: Spells from non-system compendium show up in items tab. Issue#10
+                    loadAndFilterItems(): Changed tests to switch + more explicit tests
+            0.4.5b  Show compendium source in results issue#11
                     Try showing compendium in the image mouseover
-12-Jun-2021 0.5.0   Test for Foundry 0.8.x in which creature type is now data.details.type.value                    
+12-Jun-2021 0.5.0   Test for Foundry 0.8.x in which creature type is now data.details.type.value
 9-Spt-2021  CHANGES Removed functions that are disabled in Foundry 0.9.0
                     Speed up on spells by using queries
                     Stops already in progress searches if a new one is started
                     Handles monster types from older revisions
                     Uses some built-ins for minor performance improvement
-12-Sep-2021 0.7.1   Issue #25 Initialization fails because of corrupted settings 
-                    Fix: Check for settings.loadedSpellCompendium and settings.loadedNpcCompendium                   
+12-Sep-2021 0.7.1   Issue #25 Initialization fails because of corrupted settings
+                    Fix: Check for settings.loadedSpellCompendium and settings.loadedNpcCompendium
 */
 
 const CMPBrowser = {
@@ -79,11 +79,11 @@ class CompendiumBrowser extends Application {
         // load settings
         if (this.settings === undefined) {
             this.initSettings();
-        } 
+        }
 
         await loadTemplates([
             "modules/compendium-browser/template/spell-browser.html",
-            "modules/compendium-browser/template/spell-browser-list.html",       
+            "modules/compendium-browser/template/spell-browser-list.html",
             "modules/compendium-browser/template/npc-browser.html",
             "modules/compendium-browser/template/npc-browser-list.html",
             "modules/compendium-browser/template/feat-browser.html",
@@ -96,7 +96,7 @@ class CompendiumBrowser extends Application {
         ]);
 
         this.hookCompendiumList();
-        
+
         //Reset the filters used in the dialog
         this.spellFilters = {
             registeredFilterCategorys: {},
@@ -126,12 +126,12 @@ class CompendiumBrowser extends Application {
 
 
     /** override */
-    async getData() {   
+    async getData() {
 
         //0.4.1 Filter as we load to support new way of filtering
         //Previously loaded all data and filtered in place; now loads minimal (preload) amount, filtered as we go
         //First time (when you press Compendium Browser button) is called with filters unset
- 
+
         //0.4.1k: Don't do any item/npc loading until tab is visible
         let data = {
             items : [],
@@ -348,7 +348,7 @@ class CompendiumBrowser extends Application {
                 }
             }
 
-            this.replaceList(html, browserTab);   
+            this.replaceList(html, browserTab);
         });
 
         // select filters
@@ -375,7 +375,7 @@ class CompendiumBrowser extends Application {
                     value:value
                 }
             }
-            this.replaceList(html, browserTab);      
+            this.replaceList(html, browserTab);
         });
 
         // multiselect filters
@@ -409,7 +409,7 @@ class CompendiumBrowser extends Application {
                 }
             }
 
-            this.replaceList(html, browserTab);   
+            this.replaceList(html, browserTab);
         });
 
 
@@ -441,7 +441,7 @@ class CompendiumBrowser extends Application {
         });
 
         //Just for the loading image
-        if (this.observer) { 
+        if (this.observer) {
             html.find("img").each((i,img) => this.observer.observe(img));
         }
     }
@@ -490,7 +490,7 @@ class CompendiumBrowser extends Application {
         let compactItems = {};
 
         try{
-            //Filter the full list, but only save the core compendium information + displayed info 
+            //Filter the full list, but only save the core compendium information + displayed info
             for (let pack of game.packs) {
                 if (pack['metadata']['entity'] === "Item" && this.settings.loadedSpellCompendium[pack.collection].load) {
                     //can query just for spells since there is only 1 type
@@ -499,7 +499,7 @@ class CompendiumBrowser extends Application {
                         query = {type: "spell"};
                     }
 
-                    //FIXME: How much could we do with the loaded index rather than all content? 
+                    //FIXME: How much could we do with the loaded index rather than all content?
                     //OR filter the content up front for the decoratedItem.type??
                     await pack.getDocuments(query).then(content => {
 
@@ -610,9 +610,9 @@ class CompendiumBrowser extends Application {
         if (unfoundSpells !== '') {
             console.log(`Load and Fliter Items | List of Spells that don't have a class associated to them:`);
             console.log(unfoundSpells);
-        }      
+        }
 */
-        this.itemsLoaded = true;  
+        this.itemsLoaded = true;
         console.timeEnd("loadAndFilterItems");
         console.log(`Load and Filter Items | Finished loading ${Object.keys(compactItems).length} ${browserTab}s`);
         return compactItems;
@@ -689,7 +689,7 @@ class CompendiumBrowser extends Application {
         console.log(`NPC Browser | Finished loading NPCs: ${Object.keys(npcs).length} NPCs`);
         return npcs;
     }
-    
+
 
 
     hookCompendiumList() {
@@ -714,7 +714,7 @@ class CompendiumBrowser extends Application {
                 //0.4.1: Reset filters when you click button
                 this.resetFilters();
                 //0.4.3: Reset everything (including data) when you press the button - calls afterRender() hook
-                 
+
                 if (game.user.isGM || this.settings.allowSpellBrowser) {
                     this.refreshList = "spell";
                 } else if (this.settings.allowFeatBrowser) {
@@ -729,7 +729,7 @@ class CompendiumBrowser extends Application {
         }
     }
 
-    
+
     /* Hook to load the first data */
     static afterRender(cb, html) {
         //0.4.3: Because a render always resets ALL the displayed filters (on all tabs) to unselected , we have to blank all the lists as well
@@ -752,7 +752,7 @@ class CompendiumBrowser extends Application {
 
     async replaceList(html, browserTab, options = {reload : true}) {
         //After rendering the first time or re-rendering trigger the load/reload of visible data
- 
+
         let elements = null;
         //0.4.2 Display a Loading... message while the data is being loaded and filtered
         let loadingMessage = null;
@@ -761,16 +761,16 @@ class CompendiumBrowser extends Application {
             loadingMessage = html.find("#CBSpellsMessage");
         } else if (browserTab === 'npc') {
             elements = html.find("ul#CBNPCs");
-            loadingMessage = html.find("#CBNpcsMessage");            
+            loadingMessage = html.find("#CBNpcsMessage");
         } else if (browserTab === 'feat') {
             elements = html.find("ul#CBFeats");
-            loadingMessage = html.find("#CBFeatsMessage");            
+            loadingMessage = html.find("#CBFeatsMessage");
         } else if (browserTab === 'item') {
             elements = html.find("ul#CBItems");
-            loadingMessage = html.find("#CBItemsMessage");            
+            loadingMessage = html.find("#CBItemsMessage");
         }
         if (elements?.length) {
-            //0.4.2b: On a tab-switch, only reload if there isn't any data already 
+            //0.4.2b: On a tab-switch, only reload if there isn't any data already
             if (options?.reload || !elements[0].children.length) {
 
                 const maxLoad = game.settings.get(CMPBrowser.MODULE_NAME, "maxload") ?? CMPBrowser.MAXLOAD;
@@ -780,13 +780,13 @@ class CompendiumBrowser extends Application {
                 updateLoading(0);
 
                 //Uses loadAndFilterItems to read compendia for items which pass the current filters and render on this tab
-                const newItemsHTML = await this.renderItemData(browserTab, updateLoading); 
+                const newItemsHTML = await this.renderItemData(browserTab, updateLoading);
                 elements[0].innerHTML = newItemsHTML;
                 //Re-sort before setting up lazy loading
                 this.triggerSort(html, browserTab);
 
                 //Lazy load images
-                if (this.observer) { 
+                if (this.observer) {
                     $(elements).find("img").each((i,img) => this.observer.observe(img));
                 }
 
@@ -1019,7 +1019,7 @@ class CompendiumBrowser extends Application {
 
             // getting uses/ressources status
             item.usesRessources = item5e.hasLimitedUses
-        } 
+        }
         return item;
     }
 
@@ -1224,7 +1224,7 @@ class CompendiumBrowser extends Application {
                 step: 100
             }
         });
-        
+
         // load settings from container and apply to default settings (available compendie might have changed)
         let settings = game.settings.get(CMPBrowser.MODULE_NAME, 'settings');
         for (let compKey in defaultSettings.loadedSpellCompendium) {
@@ -1243,12 +1243,12 @@ class CompendiumBrowser extends Application {
         defaultSettings.allowFeatBrowser = settings.allowFeatBrowser ? true : false;
         defaultSettings.allowItemBrowser = settings.allowItemBrowser ? true : false;
         defaultSettings.allowNpcBrowser = settings.allowNpcBrowser ? true : false;
-        
+
         if (game.user.isGM) {
             game.settings.set(CMPBrowser.MODULE_NAME, 'settings', defaultSettings);
             console.log("New default settings set");
             console.log(defaultSettings);
-        }   
+        }
         this.settings = defaultSettings;
     }
 
@@ -1349,8 +1349,8 @@ class CompendiumBrowser extends Application {
         this.addItemFilter("Item Subtype", "Weapon", 'data.weaponType', 'text', CONFIG.DND5E.weaponTypes);
         this.addItemFilter("Item Subtype", "Equipment", 'data.armor.type', 'text', CONFIG.DND5E.equipmentTypes);
         this.addItemFilter("Item Subtype", "Consumable", 'data.consumableType', 'text', CONFIG.DND5E.consumableTypes);
-        
-        this.addItemFilter("Magic Items", "Rarity", 'data.rarity', 'select', 
+
+        this.addItemFilter("Magic Items", "Rarity", 'data.rarity', 'select',
         {
             Common: "Common",
             Uncommon: "Uncommon",
@@ -1361,7 +1361,7 @@ class CompendiumBrowser extends Application {
     }
 
     async addFeatFilters() {
-        
+
         // Feature Filters
 
         this.addFeatFilter(game.i18n.localize("CMPBrowser.general"), game.i18n.localize("DND5E.Source"), 'data.source', 'text');
